@@ -1,49 +1,71 @@
-<!doctype html> 
+<!doctype html>
 <html lang="en">
-	<head> 
-		<meta charset="UTF-8" /> 
-		<title>MERNa Web</title> 
-		<style> 
-		#urlInput { 
-			width: 500px; 
-			padding: 10px; 
-			font-size: 14px; 
-		} 
-		#favoritePlacesJSON, #batmanJSON{ 
-			padding: 20px; 
-			background-color: lightgray; 
-			margin-top: 20px; 
-		} 
-		#testingDiv {
-			display: none; 
-		} 
-		</style> 
-	</head> 
-	<body> 
-		<h1>MERNa Web Application V2</h1> 
-		
-		<p>This is an HTML, CSS, and JavaScript MERNa web client. To test your MERNa server, enter your MERNa sever 
-			URL below and press test connection button.</p> 
-		<label for="urlInput">MERNa Server URL:</label><br />
-		<input type="text" id="urlInput" placeholder="Enter the URL of your remote MERNa server here..."><br /><br /> 
+<head>
+    <meta charset="UTF-8" />
+    <title>MERNa Dice Tester</title>
+    <style>
+        #urlInput { width: 500px; padding: 10px; font-size: 14px; }
+        #out { padding: 20px; background-color: lightgray; margin-top: 20px; min-height: 50px; }
+        #testingDiv { display: none; }
+    </style>
+</head>
+<body>
+    <h1>MERNa Web Application: Dice Edition</h1>
+    <p>This client tests your remote Node.js Dice Roller. Enter your Server URL below.</p>
 
-		<button onclick="testMERNaServerConnection()">Test MERNa Server Connection</button> 
-		<div id="ping"></div><br /><br /> 
-		
-	<script> 
-		async function testMERNaServerConnection() {
-			const pingField = document.getElementById("ping");
-			pingField.innerHTML = "";
+    <label for="urlInput">MERNa Server URL:</label><br />
+    <input type="text" id="urlInput" value="https://web-dice-roller-nodejs-fhggc7e2hyakdcep.centralus-01.azurewebsites.net"><br /><br />
 
-			const url = document.getElementById("urlInput").value + "/api/ping";
-			const response = await fetch(url);
-			const pingResponse = await response.text(); 
-				
-			if (pingResponse === 'ping response') {
-				pingField.innerHTML = "Success!";
-			}
-		}
+    <button onclick="testConnection()">Test Connection (Wake Up)</button>
+    <div id="pingStatus"></div><br /><br />
 
-	</script>
-</body> 
+    <div id="testingDiv">
+        <h3>Dice Controls</h3>
+        <button onclick="rollDice(1)">Roll 1 Die</button>
+        <button onclick="rollDice(5)">Roll 5 Dice</button>
+        <button onclick="triggerCorsFailure()">Test CORS Failure</button>
+
+        <div id="out">Results will appear here...</div>
+    </div>
+
+    <script>
+        // ASYNCHRONOUS WAKE UP CALL (Requirement 2)
+        async function testConnection() {
+            const statusField = document.getElementById("pingStatus");
+            const baseUrl = document.getElementById("urlInput").value;
+            
+            try {
+                const response = await fetch(baseUrl + "/api/ping");
+                const text = await response.text();
+                if (text === 'ping response') {
+                    statusField.innerHTML = "Success! Server is Awake.";
+                    document.getElementById('testingDiv').style.display = 'block';
+                }
+            } catch (err) {
+                statusField.innerHTML = "Error connecting to server.";
+            }
+        }
+
+        // CALLS REMOTE RESTful APIs (Requirement 2)
+        async function rollDice(num) {
+            const baseUrl = document.getElementById("urlInput").value;
+            const response = await fetch(`${baseUrl}/roll/${num}`);
+            const data = await response.json();
+            document.getElementById("out").innerHTML = "<pre>" + JSON.stringify(data, null, 4) + "</pre>";
+        }
+
+        // DEMONSTRATES CORS FAILURE (Requirement 2)
+        async function triggerCorsFailure() {
+            const baseUrl = document.getElementById("urlInput").value;
+            try {
+                // This calls the route defined BEFORE CORS middleware in your index.js
+                const response = await fetch(`${baseUrl}/roll-no-cors/5`);
+                const data = await response.json();
+                document.getElementById("out").innerHTML = JSON.stringify(data);
+            } catch (error) {
+                document.getElementById("out").innerHTML = "<strong>CORS ERROR:</strong> The browser blocked this request because the server route has no CORS headers.";
+            }
+        }
+    </script>
+</body>
 </html>
