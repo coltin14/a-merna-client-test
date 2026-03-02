@@ -29,7 +29,7 @@
     </div>
 
     <script>
-        // ASYNCHRONOUS WAKE UP CALL (Requirement 2)
+        // ASYNCHRONOUS WAKE UP CALL
         async function testConnection() {
             const statusField = document.getElementById("pingStatus");
             const baseUrl = document.getElementById("urlInput").value;
@@ -46,7 +46,7 @@
             }
         }
 
-        // CALLS REMOTE RESTful APIs (Requirement 2)
+        // CALLS REMOTE RESTful APIs
         async function rollDice(num) {
             const baseUrl = document.getElementById("urlInput").value;
             const response = await fetch(`${baseUrl}/roll/${num}`);
@@ -54,7 +54,7 @@
             document.getElementById("out").innerHTML = "<pre>" + JSON.stringify(data, null, 4) + "</pre>";
         }
 
-        // DEMONSTRATES CORS FAILURE (Requirement 2)
+		// TRIGGERS CORS FAILURE
         async function triggerCorsFailure() {
             const baseUrl = document.getElementById("urlInput").value;
             try {
