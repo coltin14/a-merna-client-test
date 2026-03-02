@@ -63,7 +63,7 @@
                 const data = await response.json();
                 document.getElementById("out").innerHTML = JSON.stringify(data);
             } catch (error) {
-                document.getElementById("out").innerHTML = "<strong>CORS ERROR:</strong> The browser blocked this request because the server route has no CORS headers.";
+                document.getElementById("out").innerHTML = "<strong>CORS ERROR:</strong> The browser blocked this request (expected)";
             }
         }
     </script>
